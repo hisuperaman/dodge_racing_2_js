@@ -92,14 +92,14 @@ document.addEventListener('DOMContentLoaded', e=> {
     function drawScore() {
         const text = gameScore
         ctx.fillStyle = "black"
-        ctx.font = "24px serif";
-        ctx.fillText(`${text}`, CANVAS_WIDTH-50, 40);
+        ctx.font = "22px serif";
+        ctx.fillText(`${text}`, CANVAS_WIDTH-90, 40);
     }
     
     function drawHighscore() {
         const text = `🏆 ${gameHighscore}`
         ctx.fillStyle = "black"
-        ctx.font = "24px serif";
+        ctx.font = "22px serif";
         ctx.fillText(`${text}`, 20, 40);
     }
     
