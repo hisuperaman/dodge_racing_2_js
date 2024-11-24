@@ -12,12 +12,23 @@ body{
     height: 100vh;
 }
 
-#myCanvas{
-    background-color: white;
+#myCanvas, #scoreBoard{
     width: 400px;
+    background-color: white;
+    
+}
+
+#myCanvas {
     height: 100vh;
     margin-left: 50%;
     transform: translateX(-50%);
+}
+
+#scoreBoard{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100px;
 }
 
 #loadingScreen {
