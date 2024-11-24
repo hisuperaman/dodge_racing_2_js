@@ -1,5 +1,5 @@
 class Car {
-    constructor(x, y, canvasWidth, carType="MANUAL", maxSpeed=3) {
+    constructor(x, y, canvasWidth, sprite, carType="MANUAL", maxSpeed=3) {
         this.x = x;
         this.y = y;
         this.initialY = y;
@@ -19,11 +19,7 @@ class Car {
         this.angleInterval = 0.03;
         this.directionFactor = 1;
 
-        this.sprite = new Image();
-        this.sprite.src = "./car.png";
-
-        this.trafficSprite = new Image();
-        this.trafficSprite.src = "./traffic_car.png";
+        this.sprite = sprite;
 
         this.polygon = [];
         this.damaged = false;
@@ -36,10 +32,9 @@ class Car {
         this.speedUpdated = false;
     }
 
-    update(roadBorders, traffic, gameScore=0, handleGameover) {
-        if(!this.speedUpdated && (gameScore!=0 && gameScore % 5 == 0)) {
+    update(roadBorders, traffic, gameScore=0, handleGameover=()=>{} ) {
+        if(!this.speedUpdated && (gameScore!=0 && gameScore % 50 == 0)) {
             this.maxSpeed += 0.2;
-            console.log(this.maxSpeed)
             this.speedUpdated = true;
         }
 
@@ -62,26 +57,13 @@ class Car {
         for(let i=1; i<this.polygon.length; i++) {
             ctx.lineTo(this.polygon[i].x, this.polygon[i].y);
         }
-        if(this.carType=="DUMMY") {
-            // ctx.fillStyle = "green";
-            // ctx.fill()
-
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(-this.angle);
-            ctx.drawImage(this.trafficSprite, -this.width/2, -this.height/2, this.width, this.height);
-            ctx.restore();
-        }
-        if(this.carType != "DUMMY") {
-            // ctx.fillStyle = (this.damaged) ? "gray" : "black";
-            // ctx.fill();
-
-            ctx.save();
-            ctx.translate(this.x, this.y);
-            ctx.rotate(-this.angle);
-            ctx.drawImage(this.sprite, -this.width/2, -this.height/2, this.width, this.height);
-            ctx.restore();
-        }
+        
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(-this.angle);
+        ctx.drawImage(this.sprite, -this.width/2, -this.height/2, this.width, this.height);
+        ctx.restore();
+        
         ctx.closePath();
     }
 

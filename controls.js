@@ -1,16 +1,16 @@
 class Controls {
     constructor(carType) {
-        this.forward = false;
+        this.forward = true;
         this.reverse = false;
         this.left = false;
         this.right = false;
 
+        this.spaceHit = false;
 
         if(carType!="DUMMY") {
             this.#addKeyboardControls()
             this.#addTouchControls()
         }
-        this.forward = true;
     }
 
     #addKeyboardControls() {
@@ -29,6 +29,9 @@ class Controls {
                     break;
                 case 'ArrowRight':
                     this.right = true;
+                    break;
+                case 'Space':
+                    this.spaceHit = true;
                     break;
                 default:
                     break;
@@ -49,6 +52,9 @@ class Controls {
                     break;
                 case 'ArrowRight':
                     this.right = false;
+                    break;
+                case 'Space':
+                    this.spaceHit = false;
                     break;
                 default:
                     break;
