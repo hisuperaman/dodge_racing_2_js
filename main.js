@@ -10,6 +10,8 @@ let CANVAS_HEIGHT = canvas.height = canvas.scrollHeight;
 let SCORE_BOARD_CANVAS_WIDTH = scoreBoardCanvas.width = scoreBoardCanvas.scrollWidth;
 let SCORE_BOARD_CANVAS_HEIGHT = scoreBoardCanvas.height = scoreBoardCanvas.scrollHeight;
 
+const SCORE_INCREMENT = 10;
+
 const crashSFX = new Audio("sfx/sfx_crash.mp3");
 const bgm = new Audio("sfx/bgm.mp3");
 const scoreSFX = new Audio("sfx/sfx_score.mp3");
@@ -19,6 +21,19 @@ scoreSFX.volume = 0.5;
 let spawnInterval = 800;
 let elapsedTime = 0;
 let lastPaintTime = 0;
+
+
+const carSprite = new Image();
+carSprite.src = "./sprites/car.png";
+
+const trafficCarSprites = [
+    new Image(), new Image(), new Image(), new Image(), new Image(),
+    new Image(), new Image(), new Image(), new Image(), new Image(),
+    new Image(), new Image(), new Image(),
+]
+for(let i=0; i<trafficCarSprites.length; i++) {
+    trafficCarSprites[i].src = `./sprites/traffic_car${i+1}.png`;
+}
 
 
 function resizeCanvas() {
@@ -59,7 +74,7 @@ resizeCanvas();
 
 document.addEventListener('DOMContentLoaded', e=> {
     let road = new Road(6, CANVAS_WIDTH, CANVAS_HEIGHT);
-    let car = new Car(road.getLaneCenter(2), CANVAS_HEIGHT/2, CANVAS_WIDTH);
+    let car = new Car(road.getLaneCenter(2), CANVAS_HEIGHT/2, CANVAS_WIDTH, carSprite);
     
     
     let gameScore = 0;
@@ -72,7 +87,7 @@ document.addEventListener('DOMContentLoaded', e=> {
     }
     
     let traffic = [
-        new Car(road.getLaneCenter(getRandomInteger(0, road.laneCount-1)), CANVAS_HEIGHT/2-300, CANVAS_WIDTH, "DUMMY", maxSpeed=2),
+        new Car(road.getLaneCenter(getRandomInteger(0, road.laneCount-1)), CANVAS_HEIGHT/2-300, CANVAS_WIDTH, trafficCarSprites[getRandomInteger(0, trafficCarSprites.length-1)], "DUMMY", 2),
     ]
     // console.log(traffic)
     
@@ -87,7 +102,7 @@ document.addEventListener('DOMContentLoaded', e=> {
         })
         if(!trafficCarYAlreadyPresent) {
             traffic.push(
-                new Car(trafficCarX, trafficCarY, CANVAS_WIDTH, "DUMMY", maxSpeed=2),
+                new Car(trafficCarX, trafficCarY, CANVAS_WIDTH, trafficCarSprites[getRandomInteger(0, trafficCarSprites.length-1)], "DUMMY", 2),
             )
         }
         
@@ -98,7 +113,7 @@ document.addEventListener('DOMContentLoaded', e=> {
     
             if(!c.passed && car.y < c.y) {
                 scoreSFX.play();
-                gameScore += 1;
+                gameScore += SCORE_INCREMENT;
                 car.speedUpdated = false;
                 c.passed = true;
             }
@@ -110,7 +125,7 @@ document.addEventListener('DOMContentLoaded', e=> {
     }
     
     function drawScore() {
-        const text = gameScore
+        const text = (""+gameScore).padStart(6, 0)
         scoreBoardCtx.fillStyle = "white"
         scoreBoardCtx.font = "22px serif";
         scoreBoardCtx.fillText(`${text}`, SCORE_BOARD_CANVAS_WIDTH-90, 25);
@@ -124,7 +139,7 @@ document.addEventListener('DOMContentLoaded', e=> {
     }
     
     function adjustSpawnInterval() {
-        spawnInterval = Math.max(300, 1000-(car.maxSpeed * 100))
+        spawnInterval = Math.max(250, 1000-(car.maxSpeed * 100))
     }
     
     function handleGameover() {
@@ -172,11 +187,17 @@ document.addEventListener('DOMContentLoaded', e=> {
         }
     });
 
-    document.addEventListener('keydown', function(event) {
+    document.addEventListener('keydown', function(e) {
+        const key = e.code;
         if(!gameOver) {
             bgm.play().catch(error => {
                 console.error('Error playing audio:', error);
             });
+        }
+
+        if(restartButton && key=='Space') {
+            restartButton = null;
+            restartGame();
         }
     });
 
@@ -195,9 +216,9 @@ document.addEventListener('DOMContentLoaded', e=> {
         gameScore = 0;
 
         road = new Road(6, CANVAS_WIDTH, CANVAS_HEIGHT);
-        car = new Car(road.getLaneCenter(2), CANVAS_HEIGHT/2, CANVAS_WIDTH);
+        car = new Car(road.getLaneCenter(2), CANVAS_HEIGHT/2, CANVAS_WIDTH, carSprite);
         traffic = [
-            new Car(road.getLaneCenter(getRandomInteger(0, road.laneCount-1)), CANVAS_HEIGHT/2-300, CANVAS_WIDTH, "DUMMY", maxSpeed=2),
+            new Car(road.getLaneCenter(getRandomInteger(0, road.laneCount-1)), CANVAS_HEIGHT/2-300, CANVAS_WIDTH, trafficCarSprites[getRandomInteger(0, trafficCarSprites.length-1)], "DUMMY", 2),
         ]
 
         spawnInterval = 800;
@@ -215,7 +236,7 @@ document.addEventListener('DOMContentLoaded', e=> {
         ctx.fillStyle = "#bababa";
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         
-        scoreBoardCtx.fillStyle = "#232436"
+        scoreBoardCtx.fillStyle = "#333333"
         scoreBoardCtx.fillRect(0, 0, SCORE_BOARD_CANVAS_WIDTH, SCORE_BOARD_CANVAS_HEIGHT);
     
         const deltaTime = Math.abs(lastPaintTime - timestamp);
