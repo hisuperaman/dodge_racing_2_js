@@ -1,8 +1,14 @@
 const canvas = document.getElementById('myCanvas');
 const ctx = canvas.getContext('2d');
 
+const scoreBoardCanvas = document.getElementById('scoreBoard');
+const scoreBoardCtx = scoreBoardCanvas.getContext('2d');
+
 let CANVAS_WIDTH = canvas.width = canvas.scrollWidth;
 let CANVAS_HEIGHT = canvas.height = canvas.scrollHeight;
+
+let SCORE_BOARD_CANVAS_WIDTH = scoreBoardCanvas.width = scoreBoardCanvas.scrollWidth;
+let SCORE_BOARD_CANVAS_HEIGHT = scoreBoardCanvas.height = scoreBoardCanvas.scrollHeight;
 
 const crashSFX = new Audio("sfx/sfx_crash.mp3");
 const bgm = new Audio("sfx/bgm.mp3");
@@ -30,8 +36,21 @@ function resizeCanvas() {
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
 
+
+    scoreBoardCanvas.width = canvas.width;
+    SCORE_BOARD_CANVAS_WIDTH = width;
+    scoreBoardCanvas.style.width = canvas.style.width;
+    const scoreBoardHeight = 0.05;
+    scoreBoardCanvas.height = canvas.height * scoreBoardHeight;
+    SCORE_BOARD_CANVAS_HEIGHT = height * scoreBoardHeight;
+    scoreBoardCanvas.style.height = SCORE_BOARD_CANVAS_HEIGHT + 'px';
+    scoreBoardCanvas.style.left = canvas.getBoundingClientRect().left + 'px';
+
+
+
     // ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr)
+    scoreBoardCtx.scale(dpr, dpr)
 }
 
 window.addEventListener('resize', resizeCanvas);
@@ -39,7 +58,7 @@ resizeCanvas();
 
 
 document.addEventListener('DOMContentLoaded', e=> {
-    let road = new Road(7, CANVAS_WIDTH, CANVAS_HEIGHT);
+    let road = new Road(6, CANVAS_WIDTH, CANVAS_HEIGHT);
     let car = new Car(road.getLaneCenter(2), CANVAS_HEIGHT/2, CANVAS_WIDTH);
     
     
@@ -53,8 +72,9 @@ document.addEventListener('DOMContentLoaded', e=> {
     }
     
     let traffic = [
-        new Car(road.getLaneCenter(3), CANVAS_HEIGHT/2-300, CANVAS_WIDTH, "DUMMY", maxSpeed=2),
+        new Car(road.getLaneCenter(getRandomInteger(0, road.laneCount-1)), CANVAS_HEIGHT/2-300, CANVAS_WIDTH, "DUMMY", maxSpeed=2),
     ]
+    // console.log(traffic)
     
     function spawnTraffic() {
         const trafficCarX = road.getLaneCenter(getRandomInteger(0, road.laneCount));
@@ -91,21 +111,20 @@ document.addEventListener('DOMContentLoaded', e=> {
     
     function drawScore() {
         const text = gameScore
-        ctx.fillStyle = "black"
-        ctx.font = "22px serif";
-        ctx.fillText(`${text}`, CANVAS_WIDTH-90, 40);
+        scoreBoardCtx.fillStyle = "white"
+        scoreBoardCtx.font = "22px serif";
+        scoreBoardCtx.fillText(`${text}`, SCORE_BOARD_CANVAS_WIDTH-90, 25);
     }
     
     function drawHighscore() {
         const text = `🏆 ${gameHighscore}`
-        ctx.fillStyle = "black"
-        ctx.font = "22px serif";
-        ctx.fillText(`${text}`, 20, 40);
+        scoreBoardCtx.fillStyle = "white"
+        scoreBoardCtx.font = "22px serif";
+        scoreBoardCtx.fillText(`${text}`, 20, 25);
     }
     
     function adjustSpawnInterval() {
         spawnInterval = Math.max(300, 1000-(car.maxSpeed * 100))
-        console.log(spawnInterval)
     }
     
     function handleGameover() {
@@ -175,10 +194,10 @@ document.addEventListener('DOMContentLoaded', e=> {
     function restartGame(){
         gameScore = 0;
 
-        road = new Road(7, CANVAS_WIDTH, CANVAS_HEIGHT);
+        road = new Road(6, CANVAS_WIDTH, CANVAS_HEIGHT);
         car = new Car(road.getLaneCenter(2), CANVAS_HEIGHT/2, CANVAS_WIDTH);
         traffic = [
-            new Car(road.getLaneCenter(3), CANVAS_HEIGHT/2-300, CANVAS_WIDTH, "DUMMY", maxSpeed=2),
+            new Car(road.getLaneCenter(getRandomInteger(0, road.laneCount-1)), CANVAS_HEIGHT/2-300, CANVAS_WIDTH, "DUMMY", maxSpeed=2),
         ]
 
         spawnInterval = 800;
@@ -195,6 +214,9 @@ document.addEventListener('DOMContentLoaded', e=> {
     function animate(timestamp) {
         ctx.fillStyle = "#bababa";
         ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        
+        scoreBoardCtx.fillStyle = "#232436"
+        scoreBoardCtx.fillRect(0, 0, SCORE_BOARD_CANVAS_WIDTH, SCORE_BOARD_CANVAS_HEIGHT);
     
         const deltaTime = Math.abs(lastPaintTime - timestamp);
         elapsedTime += deltaTime;
@@ -222,7 +244,7 @@ document.addEventListener('DOMContentLoaded', e=> {
         drawScore();
         drawHighscore();
         
-        ctx.translate(0, -car.y+CANVAS_HEIGHT*0.6)
+        ctx.translate(0, -car.y+CANVAS_HEIGHT*0.7)
         road.draw(ctx);
         for(let i=0; i<traffic.length; i++) {
             traffic[i].draw(ctx);

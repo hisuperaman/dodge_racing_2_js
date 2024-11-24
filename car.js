@@ -2,9 +2,10 @@ class Car {
     constructor(x, y, canvasWidth, carType="MANUAL", maxSpeed=3) {
         this.x = x;
         this.y = y;
+        this.initialY = y;
 
-        this.width = 30;
-        this.height = 50;
+        this.width = 35;
+        this.height = 60;
 
         this.canvasWidth = canvasWidth;
 

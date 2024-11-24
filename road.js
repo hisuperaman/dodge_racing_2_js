@@ -8,6 +8,8 @@ class Road {
         this.bottom = canvasHeight;
         this.left = 0+this.margin;
         this.right = canvasWidth - this.margin;
+        
+        this.canvasHeight = canvasHeight;
 
         this.laneCount = laneCount;
 
@@ -25,17 +27,19 @@ class Road {
     update(carY) {
         if(carY <= this.top+(this.canvasHeight*0.9)) {
             this.top -= this.buffer;
+            this.bottom = this.top + this.canvasHeight;
         }
         if(carY >= this.bottom-(this.canvasHeight*0.9)) {
             this.bottom += this.buffer;
+            // this.top = this.bottom + this.canvasHeight;
         }
 
         const topLeft = {x: this.left, y: this.top};
         const topRight = {x: this.right, y: this.top};
         const bottomLeft = {x: this.left, y: this.bottom};
         const bottomRight = {x: this.right, y: this.bottom};
-
         this.borders = [
+
             [topLeft, bottomLeft],
             [topRight, bottomRight]
         ]
